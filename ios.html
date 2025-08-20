@@ -49,7 +49,7 @@
     .mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt24{margin-top:24px}
     .flex{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
     .banner{border-left:3px solid var(--accent);padding:10px 12px;background:var(--accent-soft);border-radius:10px}
-    .actbar{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:6px 0 10px}
+    .actbar{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:6px 0 10px}
     .actbtn{padding:12px 10px;border:1px solid var(--border);border-radius:12px;background:#fff;text-align:center;font-weight:800;box-shadow:var(--shadow);cursor:pointer;user-select:none}
     .actbtn.active{border-color:var(--accent);box-shadow:0 0 0 1.5px var(--accent) inset,var(--shadow)}
     /* rating segmented 1..10 */
@@ -66,7 +66,7 @@
     .snack{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1f2937;color:#fff;padding:12px 14px;border-radius:12px;display:none;gap:10px;align-items:center;z-index:300;box-shadow:var(--shadow)}
     .snack.show{display:flex}
     .snack a{color:#a7f3d0;font-weight:800;text-decoration:underline}
-    @media (max-width:560px){.grid-2,.row{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr}.tabs{grid-template-columns:1fr 1fr 1fr}.actbar{grid-template-columns:repeat(5,1fr)}}
+    @media (max-width:560px){.grid-2,.row{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr}.tabs{grid-template-columns:1fr 1fr 1fr}.actbar{grid-template-columns:repeat(6,1fr)}}
   </style>
 </head>
 <body>
@@ -89,18 +89,40 @@
         <div class="actbtn" data-act="exercise">운동</div>
         <div class="actbtn" data-act="meal">밥</div>
         <div class="actbtn" data-act="rest">휴식</div>
+        <div class="actbtn" data-act="sleep">수면</div>
         <div class="actbtn" data-act="memo">메모</div>
       </div>
 
-      <div class="grid-2">
+      <!-- 일반 활동용 날짜 -->
+      <div id="normal_date_row" class="grid-2">
         <div>
           <label>날짜</label>
           <input type="date" id="date">
         </div>
-        <div id="subtype_wrap">
+        <div>
           <label>세부유형(선택)</label>
           <input type="text" id="sub_type" placeholder="문풀/런닝/점심/낮잠 등">
         </div>
+      </div>
+      
+      <!-- 수면용 날짜 -->
+      <div id="sleep_date_row" class="grid-2" style="display:none;">
+        <div>
+          <label>수면 시작일</label>
+          <input type="date" id="sleep_start_date">
+        </div>
+        <div>
+          <label>수면 종료일</label>
+          <input type="date" id="sleep_end_date">
+        </div>
+      </div>
+      
+      <div id="sleep_subtype_row" class="grid-2" style="display:none;">
+        <div>
+          <label>세부유형(선택)</label>
+          <input type="text" id="sleep_sub_type" placeholder="깊은잠/낮잠/불면 등">
+        </div>
+        <div></div>
       </div>
 
       <div id="time_wrap" class="mt12">
@@ -160,6 +182,7 @@
             <option value="exercise">운동</option>
             <option value="meal">밥</option>
             <option value="rest">휴식</option>
+            <option value="sleep">수면</option>
             <option value="memo">메모</option>
           </select>
         </div>
@@ -245,9 +268,10 @@
   function todayStr(){const d=new Date();const mm=('0'+(d.getMonth()+1)).slice(-2);const dd=('0'+d.getDate()).slice(-2);return d.getFullYear()+'-'+mm+'-'+dd;}
   function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}}
   function save(arr){localStorage.setItem(KEY,JSON.stringify(arr))}
-  function ratingLabel(act){return {study:'집중도',exercise:'RPE',meal:'포만감',rest:'회복감',memo:'메모'}[act]||'평정'}
+  function ratingLabel(act){return {study:'집중도',exercise:'RPE',meal:'포만감',rest:'회복감',sleep:'수면질',memo:'메모'}[act]||'평정'}
+  function activityName(act){return {study:'공부',exercise:'운동',meal:'밥',rest:'휴식',sleep:'수면',memo:'메모'}[act]||act}
   function toCSV(rows){
-    const header=['id','date','start_time','end_time','activity','sub_type','rating_name','rating','weight_kg','motivation','note','duration_min'];
+    const header=['id','date','start_time','end_time','activity','sub_type','rating_name','rating','weight_kg','motivation','note','duration_min','sleep_end_date'];
     const esc=v=>{if(v==null)return'';const s=String(v).replace(/"/g,'""');return /[",\n]/.test(s)?`"${s}"`:s};
     const out=[header.join(',')]; rows.forEach(r=>out.push(header.map(h=>esc(r[h])).join(','))); return out.join('\n');
   }
@@ -260,6 +284,8 @@
 
   // init date and sliders
   $('#date').value=todayStr();
+  $('#sleep_start_date').value=todayStr();
+  $('#sleep_end_date').value=todayStr();
   const startSlider=$('#start_slider'), endSlider=$('#end_slider');
   startSlider.value=540; endSlider.value=600; // 09:00~10:00 default
   $('#start_label').textContent=hhmmFromMin(Number(startSlider.value));
@@ -289,8 +315,24 @@
     const act=state.act;
     $('#rating_label').textContent=ratingLabel(act);
     const showMemo = (act==='memo');
+    const isSleep = (act==='sleep');
     $('#time_wrap').style.display = showMemo ? 'none' : '';
     $('#rating_wrap').style.display = showMemo ? 'none' : '';
+    
+    // 수면 활동에 따라 날짜 입력 필드 전환
+    if(isSleep) {
+      $('#normal_date_row').style.display = 'none';
+      $('#sleep_date_row').style.display = '';
+      $('#sleep_subtype_row').style.display = '';
+      // 수면 날짜 기본값 설정
+      const today = todayStr();
+      if(!$('#sleep_start_date').value) $('#sleep_start_date').value = today;
+      if(!$('#sleep_end_date').value) $('#sleep_end_date').value = today;
+    } else {
+      $('#normal_date_row').style.display = '';
+      $('#sleep_date_row').style.display = 'none';
+      $('#sleep_subtype_row').style.display = 'none';
+    }
   }));
 
   // time sliders
@@ -300,13 +342,19 @@
   // reset
   $('#reset_form_btn').addEventListener('click',()=>{
     $('#date').value=todayStr();
+    $('#sleep_start_date').value=todayStr();
+    $('#sleep_end_date').value=todayStr();
     startSlider.value=540; endSlider.value=600;
     $('#start_label').textContent='09:00'; $('#end_label').textContent='10:00';
-    $('#sub_type').value=''; $('#note').value=''; $('#weight').value=''; $('#motivation').value='';
+    $('#sub_type').value=''; $('#sleep_sub_type').value=''; $('#note').value=''; $('#weight').value=''; $('#motivation').value='';
     $('#rating').value=7; $$('#rating_seg .seg').forEach(x=>x.classList.toggle('active', Number(x.dataset.val)===7));
     // reset to study
     state.act='study'; $$('#actbar .actbtn').forEach(x=>x.classList.toggle('active', x.dataset.act==='study'));
     $('#time_wrap').style.display=''; $('#rating_wrap').style.display='';
+    // 날짜 필드도 원래 상태로
+    $('#normal_date_row').style.display='';
+    $('#sleep_date_row').style.display='none';
+    $('#sleep_subtype_row').style.display='none';
     showSnack('입력을 초기화했습니다.',1200);
   });
 
@@ -316,26 +364,42 @@
   // save
   function getRow(){
     const act=state.act;
-    const date=$('#date').value||todayStr();
+    let date, subType;
+    
+    if(act === 'sleep') {
+      date = $('#sleep_start_date').value || todayStr();
+      subType = ($('#sleep_sub_type').value||'').trim();
+    } else {
+      date = $('#date').value || todayStr();
+      subType = ($('#sub_type').value||'').trim();
+    }
+    
     let start='', end='', rating='';
     if (act!=='memo'){
       start = hhmmFromMin(Number(startSlider.value));
       end = hhmmFromMin(Number(endSlider.value));
       rating = Number($('#rating').value||0) || '';
     }
+    
     const row={
       id:Date.now(),
       date,
       start_time:start,
       end_time:end,
       activity:act,
-      sub_type:($('#sub_type').value||'').trim(),
+      sub_type:subType,
       rating_name:ratingLabel(act),
       rating: rating,
       weight_kg: $('#weight').value ? Number($('#weight').value) : '',
       motivation: $('#motivation').value ? Number($('#motivation').value) : '',
       note: ($('#note').value||'').trim()
     };
+    
+    // 수면의 경우 종료일도 저장
+    if(act === 'sleep') {
+      row.sleep_end_date = $('#sleep_end_date').value || date;
+    }
+    
     row.duration_min = (act!=='memo') ? durationMin(row.start_time,row.end_time) : '';
     return row;
   }
@@ -393,10 +457,14 @@
     }).sort((a,b)=>(a.date+(a.start_time||'')).localeCompare(b.date+(b.start_time||'')));
     filtered.forEach(r=>{
       const tr=document.createElement('tr');
+      let dateDisplay = r.date;
+      if(r.activity === 'sleep' && r.sleep_end_date && r.sleep_end_date !== r.date) {
+        dateDisplay = r.date + '~' + r.sleep_end_date;
+      }
       tr.innerHTML=`
-        <td>${r.date}</td>
+        <td>${dateDisplay}</td>
         <td>${r.activity==='memo' ? '-' : (r.start_time||'')+'–'+(r.end_time||'')}<div class="help">${r.duration_min? r.duration_min+'분':''}</div></td>
-        <td><span class="pill">${r.activity}</span></td>
+        <td><span class="pill">${activityName(r.activity)}</span></td>
         <td>${r.activity==='memo' ? '-' : (r.rating_name+' '+(r.rating??''))}</td>
         <td>${r.weight_kg??''}</td>
         <td>${r.motivation??''}</td>
