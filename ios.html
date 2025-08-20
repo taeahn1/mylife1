@@ -248,8 +248,8 @@
   function ratingLabel(act){return {study:'집중도',exercise:'RPE',meal:'포만감',rest:'회복감',memo:'메모'}[act]||'평정'}
   function toCSV(rows){
     const header=['id','date','start_time','end_time','activity','sub_type','rating_name','rating','weight_kg','motivation','note','duration_min'];
-    const esc=v=>{if(v==null)return'';const s=String(v).replace(/"/g,'""');return /[",\\n]/.test(s)?`"${s}"`:s};
-    const out=[header.join(',')]; rows.forEach(r=>out.push(header.map(h=>esc(r[h])).join(','))); return out.join('\\n');
+    const esc=v=>{if(v==null)return'';const s=String(v).replace(/"/g,'""');return /[",\n]/.test(s)?`"${s}"`:s};
+    const out=[header.join(',')]; rows.forEach(r=>out.push(header.map(h=>esc(r[h])).join(','))); return out.join('\n');
   }
   function withinRange(dateStr,fromStr,toStr){if(!fromStr&&!toStr)return true; if(!dateStr)return false; if(fromStr&&dateStr<fromStr)return false; if(toStr&&dateStr>toStr)return false; return true;}
   function durationMin(start,end){ if(!start||!end) return ''; const [sh,sm]=start.split(':').map(Number); const [eh,em]=end.split(':').map(Number); let s=sh*60+sm,e=eh*60+em; if(e<s)e+=1440; return e-s; }
@@ -420,7 +420,7 @@
     const from=$('#export_from').value; const to=$('#export_to').value;
     const rows=state.logs.filter(r=>withinRange(r.date,from,to)).sort((a,b)=>(a.date+(a.start_time||'')).localeCompare(b.date+(b.start_time||'')));
     if(!rows.length){showSnack('선택한 기간에 데이터가 없습니다.');return;}
-    const csv=toCSV(rows); const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob);
+    const csv='\uFEFF'+toCSV(rows); const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download=`mylife_${(from||'start').replaceAll('-','')}-${(to||'end').replaceAll('-','')}.csv`; document.body.appendChild(a); a.click();
     setTimeout(()=>{URL.revokeObjectURL(url); a.remove();}, 1000);
     showSnack('CSV 저장을 시작했습니다.',1500);
