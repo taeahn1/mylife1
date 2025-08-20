@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>내 하루 기록 · iPhone v3</title>
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --text:#1d2433;
+      --muted:#6c778a;
+      --accent:#2563eb;
+      --accent-soft:#e6efff;
+      --danger:#e11d48;
+      --border:#e7e9ef;
+      --shadow:0 6px 20px rgba(28,34,46,.08);
+      --pill:#f1f4f9;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;line-height:1.38}
+    header{position:sticky;top:0;z-index:100;background:rgba(246,247,251,.9);backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--border)}
+    .wrap{max-width:880px;margin:0 auto;padding:12px 16px}
+    h1{font-size:20px;margin:6px 0 10px 0;letter-spacing:.2px}
+    .tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+    .tab-btn{padding:10px 12px;text-align:center;border-radius:12px;background:var(--card);border:1px solid var(--border);color:var(--muted);font-weight:700;box-shadow:var(--shadow)}
+    .tab-btn.active{color:var(--text);border-color:var(--accent);box-shadow:0 0 0 1.5px var(--accent) inset, var(--shadow)}
+    main{padding:12px 16px}
+    section.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;margin:12px 0;box-shadow:var(--shadow)}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    input,select,textarea,button{width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--text);font-size:16px}
+    textarea{min-height:88px;resize:vertical}
+    button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:800}
+    button.secondary{background:#fff;color:var(--text)}
+    button.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .help{color:var(--muted);font-size:13px}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th,td{padding:10px 8px;border-bottom:1px solid var(--border);vertical-align:top}
+    th{text-align:left;color:var(--muted);font-weight:700}
+    tr:hover td{background:#fafbff}
+    .pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12.5px;background:var(--pill);color:#3b4453}
+    .right{text-align:right}
+    .mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt24{margin-top:24px}
+    .flex{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .banner{border-left:3px solid var(--accent);padding:10px 12px;background:var(--accent-soft);border-radius:10px}
+    .actbar{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:6px 0 10px}
+    .actbtn{padding:12px 10px;border:1px solid var(--border);border-radius:12px;background:#fff;text-align:center;font-weight:800;box-shadow:var(--shadow);cursor:pointer;user-select:none}
+    .actbtn.active{border-color:var(--accent);box-shadow:0 0 0 1.5px var(--accent) inset,var(--shadow)}
+    /* rating segmented 1..10 */
+    .rating-seg{display:flex;gap:6px;flex-wrap:wrap}
+    .rating-seg .seg{width:calc((100% - 9*6px)/10);min-width:28px;text-align:center;padding:10px 0;border:1px solid var(--border);border-radius:10px;cursor:pointer;user-select:none;color:#525f76;background:#fff;font-weight:700}
+    .rating-seg .seg.active{border-color:var(--accent);color:#0f1a2e;box-shadow:0 0 0 1.5px var(--accent) inset}
+    /* time sliders */
+    .slider-wrap{padding:10px;border:1px solid var(--border);border-radius:12px;background:#fff;box-shadow:var(--shadow)}
+    .tlabel{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:#3b4453;font-weight:700}
+    input[type="range"]{width:100%;margin:6px 0;height:28px;-webkit-appearance:none;background:transparent}
+    input[type="range"]::-webkit-slider-runnable-track{height:6px;background:linear-gradient(90deg,#dfe7ff,#eef2ff);border-radius:999px}
+    input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;margin-top:-10px;width:28px;height:28px;border-radius:50%;background:#fff;border:2px solid var(--accent);box-shadow:var(--shadow)}
+    /* snack */
+    .snack{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1f2937;color:#fff;padding:12px 14px;border-radius:12px;display:none;gap:10px;align-items:center;z-index:300;box-shadow:var(--shadow)}
+    .snack.show{display:flex}
+    .snack a{color:#a7f3d0;font-weight:800;text-decoration:underline}
+    @media (max-width:560px){.grid-2,.row{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr}.tabs{grid-template-columns:1fr 1fr 1fr}.actbar{grid-template-columns:repeat(5,1fr)}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>📒 내 하루 기록 (iPhone · v3)</h1>
+      <div class="tabs">
+        <a class="tab-btn active" data-tab="log">기록하기</a>
+        <a class="tab-btn" data-tab="history">히스토리</a>
+        <a class="tab-btn" data-tab="export">내보내기</a>
+      </div>
+    </div>
+  </header>
+  <main class="wrap">
+    <!-- 기록하기 -->
+    <section class="card tab-content" data-section="log" id="tab-log">
+      <label>활동</label>
+      <div class="actbar" id="actbar">
+        <div class="actbtn active" data-act="study">공부</div>
+        <div class="actbtn" data-act="exercise">운동</div>
+        <div class="actbtn" data-act="meal">밥</div>
+        <div class="actbtn" data-act="rest">휴식</div>
+        <div class="actbtn" data-act="memo">메모</div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label>날짜</label>
+          <input type="date" id="date">
+        </div>
+        <div id="subtype_wrap">
+          <label>세부유형(선택)</label>
+          <input type="text" id="sub_type" placeholder="문풀/런닝/점심/낮잠 등">
+        </div>
+      </div>
+
+      <div id="time_wrap" class="mt12">
+        <div class="slider-wrap">
+          <div class="tlabel"><span>시작 시각</span><span id="start_label">09:00</span></div>
+          <input type="range" id="start_slider" min="0" max="1435" step="5" />
+        </div>
+        <div class="slider-wrap mt12">
+          <div class="tlabel"><span>끝 시각</span><span id="end_label">10:00</span></div>
+          <input type="range" id="end_slider" min="0" max="1435" step="5" />
+        </div>
+      </div>
+
+      <div id="rating_wrap" class="mt12">
+        <label><span id="rating_label">집중도</span> (1–10)</label>
+        <input type="hidden" id="rating" value="7">
+        <div class="rating-seg" id="rating_seg"></div>
+      </div>
+
+      <div class="grid-3 mt12">
+        <div>
+          <label>몸무게(kg)</label>
+          <input type="number" id="weight" min="0" step="0.1" placeholder="선택">
+        </div>
+        <div>
+          <label>동기부여(1–10)</label>
+          <input type="number" id="motivation" min="1" max="10" step="1" placeholder="선택">
+        </div>
+        <div>
+          <label>메모(선택)</label>
+          <input type="text" id="note" placeholder="간단 메모">
+        </div>
+      </div>
+
+      <div class="row mt16">
+        <button class="primary" id="save_btn">저장</button>
+        <button class="secondary" id="reset_form_btn">입력 초기화</button>
+      </div>
+
+      <div class="banner mt16 help">
+        <b>Tip</b>: 활동 버튼 → 슬라이더로 시간만 드래그해 저장하면 끝. ‘메모’는 날짜+문장만 저장합니다.
+      </div>
+    </section>
+
+    <!-- 히스토리 -->
+    <section class="card tab-content" data-section="history" id="tab-history" style="display:none;">
+      <div class="row">
+        <div>
+          <label>검색(메모/유형)</label>
+          <input type="search" id="search_text" placeholder="키워드">
+        </div>
+        <div>
+          <label>활동 필터</label>
+          <select id="filter_activity">
+            <option value="">전체</option>
+            <option value="study">공부</option>
+            <option value="exercise">운동</option>
+            <option value="meal">밥</option>
+            <option value="rest">휴식</option>
+            <option value="memo">메모</option>
+          </select>
+        </div>
+      </div>
+      <div class="row mt12">
+        <div>
+          <label>시작일</label>
+          <input type="date" id="hist_from">
+        </div>
+        <div>
+          <label>종료일</label>
+          <input type="date" id="hist_to">
+        </div>
+      </div>
+      <div class="mt12">
+        <table id="history_table">
+          <thead>
+            <tr>
+              <th>날짜</th>
+              <th>시간</th>
+              <th>활동</th>
+              <th>평정</th>
+              <th>몸무게</th>
+              <th>동기</th>
+              <th>세부</th>
+              <th>메모</th>
+              <th class="right">삭제</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="mt12 right">
+        <button class="danger" id="clear_all_btn">전체 삭제</button>
+      </div>
+    </section>
+
+    <!-- 내보내기 -->
+    <section class="card tab-content" data-section="export" id="tab-export" style="display:none;">
+      <div class="row">
+        <div>
+          <label>내보내기 시작일</label>
+          <input type="date" id="export_from">
+        </div>
+        <div>
+          <label>내보내기 종료일</label>
+          <input type="date" id="export_to">
+        </div>
+      </div>
+
+      <div class="flex mt12">
+        <span class="pill" data-preset="thisweek">이번 주</span>
+        <span class="pill" data-preset="lastweek">지난 주</span>
+        <span class="pill" data-preset="thismonth">이번 달</span>
+      </div>
+
+      <div class="mt12">
+        <button class="primary" id="export_btn">CSV 다운로드</button>
+        <p class="help mt8">선택한 기간의 항목만 CSV로 저장됩니다.</p>
+      </div>
+
+      <div class="mt16">
+        <h3 style="margin:8px 0;">백업/복원</h3>
+        <div class="flex">
+          <button class="secondary" id="backup_json_btn">백업(JSON 저장)</button>
+          <label class="pill" for="restore_json_input" style="cursor:pointer;">복원(JSON 불러오기)</label>
+          <input type="file" id="restore_json_input" accept="application/json" style="display:none;">
+        </div>
+        <p class="help mt8">복원 시 기존 데이터에 <b>병합</b>됩니다. 완전 교체를 원하면 복원 전에 '전체 삭제'를 사용하세요.</p>
+      </div>
+    </section>
+  </main>
+
+  <div class="snack" id="snack"></div>
+
+<script>
+(function(){
+  const KEY='mylife_logs_v3';
+  const $=sel=>document.querySelector(sel);
+  const $$=sel=>Array.from(document.querySelectorAll(sel));
+
+  // helpers
+  function todayStr(){const d=new Date();const mm=('0'+(d.getMonth()+1)).slice(-2);const dd=('0'+d.getDate()).slice(-2);return d.getFullYear()+'-'+mm+'-'+dd;}
+  function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}}
+  function save(arr){localStorage.setItem(KEY,JSON.stringify(arr))}
+  function ratingLabel(act){return {study:'집중도',exercise:'RPE',meal:'포만감',rest:'회복감',memo:'메모'}[act]||'평정'}
+  function toCSV(rows){
+    const header=['id','date','start_time','end_time','activity','sub_type','rating_name','rating','weight_kg','motivation','note','duration_min'];
+    const esc=v=>{if(v==null)return'';const s=String(v).replace(/"/g,'""');return /[",\\n]/.test(s)?`"${s}"`:s};
+    const out=[header.join(',')]; rows.forEach(r=>out.push(header.map(h=>esc(r[h])).join(','))); return out.join('\\n');
+  }
+  function withinRange(dateStr,fromStr,toStr){if(!fromStr&&!toStr)return true; if(!dateStr)return false; if(fromStr&&dateStr<fromStr)return false; if(toStr&&dateStr>toStr)return false; return true;}
+  function durationMin(start,end){ if(!start||!end) return ''; const [sh,sm]=start.split(':').map(Number); const [eh,em]=end.split(':').map(Number); let s=sh*60+sm,e=eh*60+em; if(e<s)e+=1440; return e-s; }
+  function hhmmFromMin(m){m=((m%1440)+1440)%1440; const H=('0'+Math.floor(m/60)).slice(-2), M=('0'+(m%60)).slice(-2); return H+':'+M;}
+
+  // state
+  const state={logs:load(), act:'study', lastAddedId:null};
+
+  // init date and sliders
+  $('#date').value=todayStr();
+  const startSlider=$('#start_slider'), endSlider=$('#end_slider');
+  startSlider.value=540; endSlider.value=600; // 09:00~10:00 default
+  $('#start_label').textContent=hhmmFromMin(Number(startSlider.value));
+  $('#end_label').textContent=hhmmFromMin(Number(endSlider.value));
+
+  // rating seg build
+  const seg=$('#rating_seg'); for(let i=1;i<=10;i++){ const b=document.createElement('div'); b.className='seg'+(i==7?' active':''); b.textContent=i; b.dataset.val=i;
+    b.addEventListener('click',()=>{ $('#rating').value=i; $$('#rating_seg .seg').forEach(x=>x.classList.remove('active')); b.classList.add('active'); }); seg.appendChild(b);
+  }
+  $('#rating').value=7;
+
+  // activity buttons
+  // Tab switching
+  $$('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>{
+    $$('.tab-btn').forEach(x=>x.classList.remove('active')); 
+    btn.classList.add('active');
+    const tab = btn.dataset.tab;
+    $$('section[data-section]').forEach(s=>s.style.display='none');
+    const target = $(`section[data-section="${tab}"]`);
+    if(target) target.style.display='';
+    if(tab==='history') renderHistory();
+  }));
+
+  $$('#actbar .actbtn').forEach(btn=>btn.addEventListener('click',()=>{
+    $$('#actbar .actbtn').forEach(x=>x.classList.remove('active')); btn.classList.add('active');
+    state.act=btn.dataset.act;
+    const act=state.act;
+    $('#rating_label').textContent=ratingLabel(act);
+    const showMemo = (act==='memo');
+    $('#time_wrap').style.display = showMemo ? 'none' : '';
+    $('#rating_wrap').style.display = showMemo ? 'none' : '';
+  }));
+
+  // time sliders
+  startSlider.addEventListener('input',()=>{ $('#start_label').textContent=hhmmFromMin(Number(startSlider.value)); });
+  endSlider.addEventListener('input',()=>{ $('#end_label').textContent=hhmmFromMin(Number(endSlider.value)); });
+
+  // reset
+  $('#reset_form_btn').addEventListener('click',()=>{
+    $('#date').value=todayStr();
+    startSlider.value=540; endSlider.value=600;
+    $('#start_label').textContent='09:00'; $('#end_label').textContent='10:00';
+    $('#sub_type').value=''; $('#note').value=''; $('#weight').value=''; $('#motivation').value='';
+    $('#rating').value=7; $$('#rating_seg .seg').forEach(x=>x.classList.toggle('active', Number(x.dataset.val)===7));
+    // reset to study
+    state.act='study'; $$('#actbar .actbtn').forEach(x=>x.classList.toggle('active', x.dataset.act==='study'));
+    $('#time_wrap').style.display=''; $('#rating_wrap').style.display='';
+    showSnack('입력을 초기화했습니다.',1200);
+  });
+
+  // snackbar
+  function showSnack(html,timeout=2000){ const s=$('#snack'); s.innerHTML=html; s.classList.add('show'); setTimeout(()=>s.classList.remove('show'),timeout); }
+
+  // save
+  function getRow(){
+    const act=state.act;
+    const date=$('#date').value||todayStr();
+    let start='', end='', rating='';
+    if (act!=='memo'){
+      start = hhmmFromMin(Number(startSlider.value));
+      end = hhmmFromMin(Number(endSlider.value));
+      rating = Number($('#rating').value||0) || '';
+    }
+    const row={
+      id:Date.now(),
+      date,
+      start_time:start,
+      end_time:end,
+      activity:act,
+      sub_type:($('#sub_type').value||'').trim(),
+      rating_name:ratingLabel(act),
+      rating: rating,
+      weight_kg: $('#weight').value ? Number($('#weight').value) : '',
+      motivation: $('#motivation').value ? Number($('#motivation').value) : '',
+      note: ($('#note').value||'').trim()
+    };
+    row.duration_min = (act!=='memo') ? durationMin(row.start_time,row.end_time) : '';
+    return row;
+  }
+
+  function isOverlap(row){
+    if (!row.start_time || !row.end_time) return false;
+    const sameDay=state.logs.filter(r=>r.date===row.date && r.activity!=='memo');
+    const sMin=x=>{const [h,m]=x.split(':').map(Number);return h*60+m;};
+    const inRange=(a,b,x)=>(x>=a && x<b);
+    const x=sMin(row.start_time), y=sMin(row.end_time);
+    for(const r of sameDay){
+      if(!r.start_time||!r.end_time)continue;
+      const a=sMin(r.start_time), b=sMin(r.end_time);
+      if (inRange(a,b,x) || inRange(a,b,y) || inRange(x,y,a) || inRange(x,y,b)) return true;
+    }
+    return false;
+  }
+
+  function saveRow(row){
+    state.logs.push(row); save(state.logs); state.lastAddedId=row.id;
+    showSnack('저장됨 · <a id="undo_link" href="#">↺ 되돌리기</a>');
+    setTimeout(()=>{const u=$('#undo_link'); if(u){u.addEventListener('click',e=>{e.preventDefault(); undoLast();});}},50);
+    renderHistory();
+  }
+
+  function undoLast(){
+    if(!state.lastAddedId) return;
+    state.logs = state.logs.filter(x=>x.id!==state.lastAddedId);
+    save(state.logs); state.lastAddedId=null;
+    showSnack('되돌렸습니다.',1200);
+    renderHistory();
+  }
+
+  $('#save_btn').addEventListener('click',()=>{
+    const row=getRow();
+    if(!row.date) return showSnack('날짜를 입력하세요.');
+    if(state.act!=='memo'){
+      if(!row.start_time||!row.end_time) return showSnack('시작/끝 시각을 설정하세요.');
+      if(!row.rating) return showSnack('평정(1–10)을 선택하세요.');
+      if(isOverlap(row) && !confirm('겹치는 시간이 있습니다. 그래도 저장할까요?')) return;
+    }
+    saveRow(row);
+  });
+
+  // history
+  function renderHistory(){
+    const tbody=$('#history_table tbody'); tbody.innerHTML='';
+    const q=($('#search_text').value||'').toLowerCase();
+    const act=$('#filter_activity').value; const from=$('#hist_from').value; const to=$('#hist_to').value;
+    const filtered=state.logs.filter(r=>{
+      const inAct=act? r.activity===act : true;
+      const inText=q ? (String(r.note||'').toLowerCase().includes(q) || String(r.sub_type||'').toLowerCase().includes(q)) : true;
+      const inRange=withinRange(r.date,from,to);
+      return inAct && inText && inRange;
+    }).sort((a,b)=>(a.date+(a.start_time||'')).localeCompare(b.date+(b.start_time||'')));
+    filtered.forEach(r=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td>${r.date}</td>
+        <td>${r.activity==='memo' ? '-' : (r.start_time||'')+'–'+(r.end_time||'')}<div class="help">${r.duration_min? r.duration_min+'분':''}</div></td>
+        <td><span class="pill">${r.activity}</span></td>
+        <td>${r.activity==='memo' ? '-' : (r.rating_name+' '+(r.rating??''))}</td>
+        <td>${r.weight_kg??''}</td>
+        <td>${r.motivation??''}</td>
+        <td>${r.sub_type? '<span class="pill">'+r.sub_type+'</span>' : ''}</td>
+        <td>${r.note||''}</td>
+        <td class="right"><button class="danger" data-del="${r.id}">삭제</button></td>`;
+      tbody.appendChild(tr);
+    });
+    $$('button[data-del]').forEach(btn=>btn.addEventListener('click',()=>{
+      const id=Number(btn.getAttribute('data-del'));
+      state.logs=state.logs.filter(x=>x.id!==id); save(state.logs); renderHistory();
+    }));
+  }
+  $('#search_text').addEventListener('input',renderHistory);
+  $('#filter_activity').addEventListener('change',renderHistory);
+  $('#hist_from').addEventListener('change',renderHistory);
+  $('#hist_to').addEventListener('change',renderHistory);
+
+  // export CSV
+  $('#export_btn').addEventListener('click',()=>{
+    const from=$('#export_from').value; const to=$('#export_to').value;
+    const rows=state.logs.filter(r=>withinRange(r.date,from,to)).sort((a,b)=>(a.date+(a.start_time||'')).localeCompare(b.date+(b.start_time||'')));
+    if(!rows.length){showSnack('선택한 기간에 데이터가 없습니다.');return;}
+    const csv=toCSV(rows); const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=`mylife_${(from||'start').replaceAll('-','')}-${(to||'end').replaceAll('-','')}.csv`; document.body.appendChild(a); a.click();
+    setTimeout(()=>{URL.revokeObjectURL(url); a.remove();}, 1000);
+    showSnack('CSV 저장을 시작했습니다.',1500);
+  });
+
+  // presets
+  function setPreset(which){
+    const now=new Date(); const dow=(now.getDay()+6)%7; let from,to;
+    if(which==='thisweek'){const monday=new Date(now); monday.setDate(now.getDate()-dow); const sunday=new Date(monday); sunday.setDate(monday.getDate()+6); from=monday; to=sunday;}
+    else if(which==='lastweek'){const monday=new Date(now); monday.setDate(now.getDate()-dow-7); const sunday=new Date(monday); sunday.setDate(monday.getDate()+6); from=monday; to=sunday;}
+    else if(which==='thismonth'){const first=new Date(now.getFullYear(), now.getMonth(), 1); const last=new Date(now.getFullYear(), now.getMonth()+1, 0); from=first; to=last;}
+    $('#export_from').value=from.toISOString().slice(0,10);
+    $('#export_to').value=to.toISOString().slice(0,10);
+    $('#hist_from').value=$('#export_from').value;
+    $('#hist_to').value=$('#export_to').value;
+    renderHistory(); showSnack('기간이 설정되었습니다.');
+  }
+  $$('[data-preset]').forEach(el=>el.addEventListener('click',()=>setPreset(el.dataset.preset)));
+
+  // backup/restore
+  $('#backup_json_btn').addEventListener('click',()=>{
+    const blob=new Blob([JSON.stringify(state.logs,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`mylife_backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click();
+    setTimeout(()=>{URL.revokeObjectURL(url); a.remove();}, 1000); showSnack('JSON 백업을 저장했습니다.');
+  });
+  $('#restore_json_input').addEventListener('change',e=>{
+    const file=e.target.files[0]; if(!file)return;
+    const reader=new FileReader(); reader.onload=()=>{
+      try{const arr=JSON.parse(reader.result); if(!Array.isArray(arr)) throw new Error('형식 오류');
+        const byId=new Map(state.logs.map(x=>[x.id,x])); arr.forEach(x=>{ if(x && x.id && !byId.has(x.id)) byId.set(x.id,x); });
+        state.logs=Array.from(byId.values()); save(state.logs); renderHistory(); showSnack('JSON 복원이 완료되었습니다.');
+      }catch(err){showSnack('JSON 파일을 읽을 수 없습니다.');}
+      e.target.value='';
+    }; reader.readAsText(file);
+  });
+
+  // initial render
+  renderHistory();
+})();</script>
+</body>
+</html>
