@@ -179,7 +179,7 @@
       </div>
 
       <!-- ✅ 일일 지표 퀵 입력 (아침체중/단백질/크레아틴/D-값) -->
-      <section class="card mt12" id="daily_quick">
+      <section class="card mt12" id="daily_quick" style="display:none;">
         <div class="grid-3">
           <div>
             <label>아침 체중(kg)</label>
@@ -400,6 +400,7 @@
     $('#study_extra').style.display = isStudy ? '' : 'none';
     $('#sleep_extra').style.display = isSleep ? '' : 'none';
     $('#ex_builder').style.display = isExercise ? '' : 'none';
+    $('#daily_quick').style.display = showMemo ? '' : 'none';
 
     if(isSleep){
       $('#normal_date_row').style.display = 'none';
@@ -447,7 +448,7 @@
     if(!state.sets.length){ list.innerHTML='<div class="help">세트를 추가하면 여기 표시됩니다.</div>'; $('#ex_summary').textContent=''; return; }
     state.sets.forEach((st,i)=>{
       const row=document.createElement('div'); row.className='flex';
-      row.innerHTML=`<span class="pill setbadge">#${i+1}</span><span>${st.weight}kg × ${st.reps} reps</span><span class="help">RPE ${st.rpe??'-'}</span><button class="danger" data-del-index="${i}">삭제</button>`;
+      row.innerHTML=`<span class="pill setbadge">#${i+1}</span><span>${st.weight}kg × ${st.reps} reps</span><span class="help">RPE ${st.rpe??'-'}</span><div style="flex-grow:1"></div><button class="danger" data-del-index="${i}" style="width:28px; height:28px; border-radius:50%; padding:0; font-size:14px; line-height:28px;">X</button>`;
       list.appendChild(row);
     });
     $$('#set_list [data-del-index]').forEach(btn=>btn.addEventListener('click',()=>{
@@ -586,7 +587,7 @@
       const inText=q ? (String(r.note||'').toLowerCase().includes(q) || String(r.sub_type||'').toLowerCase().includes(q)) : true;
       const inRange=withinRange(r.date,from,to);
       return inAct && inText && inRange;
-    }).sort((a,b)=>(a.date+(a.start_time||'')).localeCompare(b.date+(b.start_time||'')));
+    }).sort((a,b)=>(b.date+(b.start_time||'')).localeCompare(a.date+(a.start_time||'')));
 
     filtered.forEach(r=>{
       const tr=document.createElement('tr');
