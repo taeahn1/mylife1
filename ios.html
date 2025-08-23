@@ -5,19 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>내 하루 기록 · iPhone v3</title>
+  <title>내 하루 기록 · iPhone v3+</title>
   <style>
     :root{
-      --bg:#f6f7fb;
-      --card:#ffffff;
-      --text:#1d2433;
-      --muted:#6c778a;
-      --accent:#2563eb;
-      --accent-soft:#e6efff;
-      --danger:#e11d48;
-      --border:#e7e9ef;
-      --shadow:0 6px 20px rgba(28,34,46,.08);
-      --pill:#f1f4f9;
+      --bg:#f6f7fb; --card:#ffffff; --text:#1d2433; --muted:#6c778a; --accent:#2563eb; --accent-soft:#e6efff; --danger:#e11d48; --border:#e7e9ef; --shadow:0 6px 20px rgba(28,34,46,.08); --pill:#f1f4f9;
     }
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     html,body{height:100%}
@@ -26,7 +17,7 @@
     .wrap{max-width:880px;margin:0 auto;padding:12px 16px}
     h1{font-size:20px;margin:6px 0 10px 0;letter-spacing:.2px}
     .tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-    .tab-btn{padding:10px 12px;text-align:center;border-radius:12px;background:var(--card);border:1px solid var(--border);color:var(--muted);font-weight:700;box-shadow:var(--shadow)}
+    .tab-btn{padding:10px 12px;text-align:center;border-radius:12px;background:var(--card);border:1px solid var(--border);color:var(--muted);font-weight:700;box-shadow:var(--shadow);cursor:pointer}
     .tab-btn.active{color:var(--text);border-color:var(--accent);box-shadow:0 0 0 1.5px var(--accent) inset, var(--shadow)}
     main{padding:12px 16px}
     section.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;margin:12px 0;box-shadow:var(--shadow)}
@@ -34,17 +25,18 @@
     .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
     label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
     input,select,textarea,button{width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--text);font-size:16px}
+    input[type="checkbox"]{width:auto;height:auto}
     textarea{min-height:88px;resize:vertical}
-    button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:800}
-    button.secondary{background:#fff;color:var(--text)}
-    button.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+    button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:800;cursor:pointer}
+    button.secondary{background:#fff;color:var(--text);cursor:pointer}
+    button.danger{background:var(--danger);border-color:var(--danger);color:#fff;cursor:pointer}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .help{color:var(--muted);font-size:13px}
     table{width:100%;border-collapse:collapse;font-size:14px}
     th,td{padding:10px 8px;border-bottom:1px solid var(--border);vertical-align:top}
     th{text-align:left;color:var(--muted);font-weight:700}
     tr:hover td{background:#fafbff}
-    .pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12.5px;background:var(--pill);color:#3b4453}
+    .pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12.5px;background:var(--pill);color:#3b4453;margin:2px 4px 0 0}
     .right{text-align:right}
     .mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt24{margin-top:24px}
     .flex{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -52,31 +44,32 @@
     .actbar{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:6px 0 10px}
     .actbtn{padding:12px 10px;border:1px solid var(--border);border-radius:12px;background:#fff;text-align:center;font-weight:800;box-shadow:var(--shadow);cursor:pointer;user-select:none}
     .actbtn.active{border-color:var(--accent);box-shadow:0 0 0 1.5px var(--accent) inset,var(--shadow)}
-    /* rating segmented 1..10 */
     .rating-seg{display:flex;gap:6px;flex-wrap:wrap}
     .rating-seg .seg{width:calc((100% - 9*6px)/10);min-width:28px;text-align:center;padding:10px 0;border:1px solid var(--border);border-radius:10px;cursor:pointer;user-select:none;color:#525f76;background:#fff;font-weight:700}
     .rating-seg .seg.active{border-color:var(--accent);color:#0f1a2e;box-shadow:0 0 0 1.5px var(--accent) inset}
-    /* time sliders */
     .slider-wrap{padding:10px;border:1px solid var(--border);border-radius:12px;background:#fff;box-shadow:var(--shadow)}
     .tlabel{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:#3b4453;font-weight:700}
     input[type="range"]{width:100%;margin:6px 0;height:28px;-webkit-appearance:none;background:transparent}
     input[type="range"]::-webkit-slider-runnable-track{height:6px;background:linear-gradient(90deg,#dfe7ff,#eef2ff);border-radius:999px}
     input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;margin-top:-10px;width:28px;height:28px;border-radius:50%;background:#fff;border:2px solid var(--accent);box-shadow:var(--shadow)}
-    /* snack */
     .snack{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1f2937;color:#fff;padding:12px 14px;border-radius:12px;display:none;gap:10px;align-items:center;z-index:300;box-shadow:var(--shadow)}
     .snack.show{display:flex}
     .snack a{color:#a7f3d0;font-weight:800;text-decoration:underline}
-    @media (max-width:560px){.grid-2,.row{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr}.tabs{grid-template-columns:1fr 1fr 1fr}.actbar{grid-template-columns:repeat(6,1fr)}}
+    /* exercise builder */
+    .setrow{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;align-items:center}
+    .setlist{border:1px solid var(--border);border-radius:12px;padding:8px}
+    .setbadge{font-variant-numeric:tabular-nums}
+    @media (max-width:560px){.grid-2,.row{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr}.tabs{grid-template-columns:1fr 1fr 1fr}.actbar{grid-template-columns:repeat(6,1fr)}.setrow{grid-template-columns:1.4fr 1fr 1fr 1fr auto}}
   </style>
 </head>
 <body>
   <header>
     <div class="wrap">
-      <h1>📒 내 하루 기록 (iPhone · v3)</h1>
+      <h1>📒 내 하루 기록 (iPhone · v3+)</h1>
       <div class="tabs">
-        <a class="tab-btn active" data-tab="log">기록하기</a>
-        <a class="tab-btn" data-tab="history">히스토리</a>
-        <a class="tab-btn" data-tab="export">내보내기</a>
+        <div class="tab-btn active" data-tab="log">기록하기</div>
+        <div class="tab-btn" data-tab="history">히스토리</div>
+        <div class="tab-btn" data-tab="export">내보내기</div>
       </div>
     </div>
   </header>
@@ -101,7 +94,7 @@
         </div>
         <div>
           <label>세부유형(선택)</label>
-          <input type="text" id="sub_type" placeholder="문풀/런닝/점심/낮잠 등">
+          <input type="text" id="sub_type" placeholder="문풀/벤치/점심/낮잠 등">
         </div>
       </div>
       
@@ -142,6 +135,34 @@
         <div class="rating-seg" id="rating_seg"></div>
       </div>
 
+      <!-- ✅ 공부 추가 필드 -->
+      <div id="study_extra" class="grid-2 mt12" style="display:none;">
+        <div>
+          <label>즉시 회상률(%)</label>
+          <input type="number" id="recall_score_pct" min="0" max="100" step="1" placeholder="예: 85">
+        </div>
+        <div>
+          <label>방해 횟수</label>
+          <input type="number" id="distraction_count" min="0" step="1" placeholder="예: 0">
+        </div>
+      </div>
+
+      <!-- ✅ 수면 추가 필드 (패턴 교정용) -->
+      <div id="sleep_extra" class="grid-3 mt12" style="display:none;">
+        <div>
+          <label>입면 지연(분)</label>
+          <input type="number" id="sleep_latency_min" min="0" step="1" placeholder="잠들기까지 걸린 시간">
+        </div>
+        <div>
+          <label>마지막 카페인 시각</label>
+          <input type="time" id="last_caffeine_time">
+        </div>
+        <div>
+          <label>스크린 오프 시각</label>
+          <input type="time" id="screens_off_time">
+        </div>
+      </div>
+
       <div class="grid-3 mt12">
         <div>
           <label>몸무게(kg)</label>
@@ -157,13 +178,69 @@
         </div>
       </div>
 
+      <!-- ✅ 일일 지표 퀵 입력 (아침체중/단백질/크레아틴/D-값) -->
+      <section class="card mt12" id="daily_quick">
+        <div class="grid-3">
+          <div>
+            <label>아침 체중(kg)</label>
+            <input type="number" id="morning_weight_kg" min="0" step="0.1" placeholder="공복 체중">
+          </div>
+          <div>
+            <label>일일 단백질(g)</label>
+            <input type="number" id="protein_g_day" min="0" step="1" placeholder="예: 160">
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:10px">
+            <div style="flex:1">
+              <label>크레아틴 5g</label>
+              <div class="flex"><input type="checkbox" id="creatine_5g"><span class="help">복용 시 체크</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-2 mt12">
+          <div>
+            <label>시험 임박도 (D-)</label>
+            <input type="number" id="days_to_exam" min="0" step="1" placeholder="예: 21">
+          </div>
+          <div class="flex" style="align-items:flex-end;justify-content:flex-end">
+            <button class="secondary" id="daily_save_btn">일일 지표 빠른 저장</button>
+          </div>
+        </div>
+        <p class="help mt8">날짜는 상단의 <b>날짜</b> 입력값을 사용합니다. CSV로 함께 내보내집니다.</p>
+      </section>
+
+      <!-- ✅ 운동 세트 기록 (간단 · 헬스앱 스타일) -->
+      <section class="card mt12" id="ex_builder" style="display:none;">
+        <div class="grid-2">
+          <div>
+            <label>운동명</label>
+            <input list="movements" id="ex_movement" placeholder="예: 벤치프레스">
+            <datalist id="movements">
+              <option>스쿼트</option><option>벤치프레스</option><option>데드리프트</option><option>오버헤드프레스</option><option>바벨로우</option><option>랫풀다운</option><option>풀업</option><option>레그프레스</option>
+            </datalist>
+          </div>
+          <div>
+            <label>노트(선택)</label>
+            <input type="text" id="ex_note" placeholder="예: 중량 상승, 폼 안정">
+          </div>
+        </div>
+        <div class="setrow mt12">
+          <input type="number" id="ex_weight" placeholder="kg" min="0" step="0.5">
+          <input type="number" id="ex_reps" placeholder="reps" min="1" step="1">
+          <input type="number" id="ex_rpe" placeholder="RPE" min="1" max="10" step="0.5">
+          <button class="secondary" id="add_set_btn">세트 추가</button>
+          <button class="danger" id="clear_sets_btn">세트 초기화</button>
+        </div>
+        <div class="setlist mt12" id="set_list"></div>
+        <div class="help mt8" id="ex_summary"></div>
+      </section>
+
       <div class="row mt16">
         <button class="primary" id="save_btn">저장</button>
         <button class="secondary" id="reset_form_btn">입력 초기화</button>
       </div>
 
       <div class="banner mt16 help">
-        <b>Tip</b>: 활동 버튼 → 슬라이더로 시간만 드래그해 저장하면 끝. ‘메모’는 날짜+문장만 저장합니다.
+        <b>Tip</b>: 활동 버튼 → 슬라이더로 시간만 드래그해 저장하면 끝. 일일 지표 영역은 <b>원터치</b>로 따로 저장할 수 있습니다.
       </div>
     </section>
 
@@ -271,7 +348,7 @@
   function ratingLabel(act){return {study:'집중도',exercise:'RPE',meal:'포만감',rest:'회복감',sleep:'수면질',memo:'메모'}[act]||'평정'}
   function activityName(act){return {study:'공부',exercise:'운동',meal:'밥',rest:'휴식',sleep:'수면',memo:'메모'}[act]||act}
   function toCSV(rows){
-    const header=['id','date','start_time','end_time','activity','sub_type','rating_name','rating','weight_kg','motivation','note','duration_min','sleep_end_date'];
+    const header=['id','date','start_time','end_time','activity','sub_type','rating_name','rating','weight_kg','motivation','note','duration_min','sleep_end_date','morning_weight_kg','protein_g_day','creatine_5g','last_caffeine_time','screens_off_time','sleep_latency_min','recall_score_pct','distraction_count','days_to_exam','exercise_json'];
     const esc=v=>{if(v==null)return'';const s=String(v).replace(/"/g,'""');return /[",\n]/.test(s)?`"${s}"`:s};
     const out=[header.join(',')]; rows.forEach(r=>out.push(header.map(h=>esc(r[h])).join(','))); return out.join('\n');
   }
@@ -280,7 +357,7 @@
   function hhmmFromMin(m){m=((m%1440)+1440)%1440; const H=('0'+Math.floor(m/60)).slice(-2), M=('0'+(m%60)).slice(-2); return H+':'+M;}
 
   // state
-  const state={logs:load(), act:'study', lastAddedId:null};
+  const state={logs:load(), act:'study', lastAddedId:null, sets:[]};
 
   // init date and sliders
   $('#date').value=todayStr();
@@ -297,8 +374,7 @@
   }
   $('#rating').value=7;
 
-  // activity buttons
-  // Tab switching
+  // tabs
   $$('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>{
     $$('.tab-btn').forEach(x=>x.classList.remove('active')); 
     btn.classList.add('active');
@@ -309,6 +385,7 @@
     if(tab==='history') renderHistory();
   }));
 
+  // activity buttons
   $$('#actbar .actbtn').forEach(btn=>btn.addEventListener('click',()=>{
     $$('#actbar .actbtn').forEach(x=>x.classList.remove('active')); btn.classList.add('active');
     state.act=btn.dataset.act;
@@ -316,15 +393,18 @@
     $('#rating_label').textContent=ratingLabel(act);
     const showMemo = (act==='memo');
     const isSleep = (act==='sleep');
+    const isStudy = (act==='study');
+    const isExercise = (act==='exercise');
     $('#time_wrap').style.display = showMemo ? 'none' : '';
     $('#rating_wrap').style.display = showMemo ? 'none' : '';
-    
-    // 수면 활동에 따라 날짜 입력 필드 전환
-    if(isSleep) {
+    $('#study_extra').style.display = isStudy ? '' : 'none';
+    $('#sleep_extra').style.display = isSleep ? '' : 'none';
+    $('#ex_builder').style.display = isExercise ? '' : 'none';
+
+    if(isSleep){
       $('#normal_date_row').style.display = 'none';
       $('#sleep_date_row').style.display = '';
       $('#sleep_subtype_row').style.display = '';
-      // 수면 날짜 기본값 설정
       const today = todayStr();
       if(!$('#sleep_start_date').value) $('#sleep_start_date').value = today;
       if(!$('#sleep_end_date').value) $('#sleep_end_date').value = today;
@@ -347,59 +427,96 @@
     startSlider.value=540; endSlider.value=600;
     $('#start_label').textContent='09:00'; $('#end_label').textContent='10:00';
     $('#sub_type').value=''; $('#sleep_sub_type').value=''; $('#note').value=''; $('#weight').value=''; $('#motivation').value='';
+    $('#recall_score_pct').value=''; $('#distraction_count').value='';
+    $('#sleep_latency_min').value=''; $('#last_caffeine_time').value=''; $('#screens_off_time').value='';
+    $('#morning_weight_kg').value=''; $('#protein_g_day').value=''; $('#creatine_5g').checked=false; $('#days_to_exam').value='';
     $('#rating').value=7; $$('#rating_seg .seg').forEach(x=>x.classList.toggle('active', Number(x.dataset.val)===7));
-    // reset to study
     state.act='study'; $$('#actbar .actbtn').forEach(x=>x.classList.toggle('active', x.dataset.act==='study'));
     $('#time_wrap').style.display=''; $('#rating_wrap').style.display='';
-    // 날짜 필드도 원래 상태로
-    $('#normal_date_row').style.display='';
-    $('#sleep_date_row').style.display='none';
-    $('#sleep_subtype_row').style.display='none';
+    $('#normal_date_row').style.display=''; $('#sleep_date_row').style.display='none'; $('#sleep_subtype_row').style.display='none';
+    state.sets=[]; renderSets();
     showSnack('입력을 초기화했습니다.',1200);
   });
 
   // snackbar
   function showSnack(html,timeout=2000){ const s=$('#snack'); s.innerHTML=html; s.classList.add('show'); setTimeout(()=>s.classList.remove('show'),timeout); }
 
-  // save
+  // exercise builder logic
+  function renderSets(){
+    const list=$('#set_list'); list.innerHTML='';
+    if(!state.sets.length){ list.innerHTML='<div class="help">세트를 추가하면 여기 표시됩니다.</div>'; $('#ex_summary').textContent=''; return; }
+    state.sets.forEach((st,i)=>{
+      const row=document.createElement('div'); row.className='flex';
+      row.innerHTML=`<span class="pill setbadge">#${i+1}</span><span>${st.weight}kg × ${st.reps} reps</span><span class="help">RPE ${st.rpe??'-'}</span><button class="danger" data-del-index="${i}">삭제</button>`;
+      list.appendChild(row);
+    });
+    $$('#set_list [data-del-index]').forEach(btn=>btn.addEventListener('click',()=>{
+      const idx=Number(btn.getAttribute('data-del-index')); state.sets.splice(idx,1); renderSets();
+    }));
+    const volume = state.sets.reduce((a,b)=>a+(Number(b.weight)||0)*(Number(b.reps)||0),0);
+    // top set by weight*reps heuristic
+    let top=null, topScore=-1; state.sets.forEach(s=>{const sc=(Number(s.weight)||0)*(Number(s.reps)||0); if(sc>topScore){topScore=sc; top=s;}});
+    const mv=$('#ex_movement').value||'운동';
+    $('#ex_summary').textContent = `${mv}: ${state.sets.length}세트 · 총볼륨 ${volume}kg·reps${top?` · Top ${top.weight}kg×${top.reps}`:''}`;
+  }
+
+  $('#add_set_btn').addEventListener('click',()=>{
+    const w=Number($('#ex_weight').value); const r=Number($('#ex_reps').value); const p=$('#ex_rpe').value? Number($('#ex_rpe').value):null;
+    if(!(w>0&&r>0)) return showSnack('중량과 반복을 입력하세요.');
+    state.sets.push({weight:w,reps:r,rpe:p});
+    $('#ex_weight').value=''; $('#ex_reps').value=''; $('#ex_rpe').value='';
+    renderSets();
+  });
+  $('#clear_sets_btn').addEventListener('click',()=>{ state.sets=[]; renderSets(); });
+
+  // save (main)
   function getRow(){
     const act=state.act;
     let date, subType;
-    
-    if(act === 'sleep') {
-      date = $('#sleep_start_date').value || todayStr();
-      subType = ($('#sleep_sub_type').value||'').trim();
-    } else {
-      date = $('#date').value || todayStr();
-      subType = ($('#sub_type').value||'').trim();
-    }
-    
+    if(act === 'sleep') { date = $('#sleep_start_date').value || todayStr(); subType = ($('#sleep_sub_type').value||'').trim(); }
+    else { date = $('#date').value || todayStr(); subType = ($('#sub_type').value||'').trim(); }
+
     let start='', end='', rating='';
     if (act!=='memo'){
-      start = hhmmFromMin(Number(startSlider.value));
-      end = hhmmFromMin(Number(endSlider.value));
+      start = hhmmFromMin(Number($('#start_slider').value));
+      end = hhmmFromMin(Number($('#end_slider').value));
       rating = Number($('#rating').value||0) || '';
     }
-    
+
     const row={
-      id:Date.now(),
-      date,
-      start_time:start,
-      end_time:end,
-      activity:act,
-      sub_type:subType,
-      rating_name:ratingLabel(act),
-      rating: rating,
+      id:Date.now(), date, start_time:start, end_time:end, activity:act, sub_type:subType,
+      rating_name:ratingLabel(act), rating: rating,
       weight_kg: $('#weight').value ? Number($('#weight').value) : '',
       motivation: $('#motivation').value ? Number($('#motivation').value) : '',
-      note: ($('#note').value||'').trim()
+      note: ($('#note').value||'').trim(),
+      morning_weight_kg:'', protein_g_day:'', creatine_5g:'', last_caffeine_time:'', screens_off_time:'', sleep_latency_min:'', recall_score_pct:'', distraction_count:'', days_to_exam:'', exercise_json:''
     };
-    
-    // 수면의 경우 종료일도 저장
-    if(act === 'sleep') {
+
+    // 수면 확장 필드
+    if(act==='sleep'){
       row.sleep_end_date = $('#sleep_end_date').value || date;
+      row.sleep_latency_min = $('#sleep_latency_min').value? Number($('#sleep_latency_min').value):'';
+      row.last_caffeine_time = $('#last_caffeine_time').value || '';
+      row.screens_off_time = $('#screens_off_time').value || '';
     }
-    
+
+    // 공부 확장 필드
+    if(act==='study'){
+      row.recall_score_pct = $('#recall_score_pct').value? Number($('#recall_score_pct').value):'';
+      row.distraction_count = $('#distraction_count').value? Number($('#distraction_count').value):'';
+    }
+
+    // 운동 세트 JSON
+    if(act==='exercise' && state.sets.length){
+      const mv=$('#ex_movement').value||''; const note=$('#ex_note').value||'';
+      const volume = state.sets.reduce((a,b)=>a+(Number(b.weight)||0)*(Number(b.reps)||0),0);
+      let top=null, topScore=-1; state.sets.forEach(s=>{const sc=(Number(s.weight)||0)*(Number(s.reps)||0); if(sc>topScore){topScore=sc; top=s;}});
+      const payload={movement:mv, note, sets:state.sets, total_volume:volume, top_set:top};
+      row.exercise_json = JSON.stringify(payload);
+      // 세부 표시 보조로 sub_type 비워져 있으면 운동명 채우기
+      if(!row.sub_type && mv) row.sub_type = mv;
+    }
+
     row.duration_min = (act!=='memo') ? durationMin(row.start_time,row.end_time) : '';
     return row;
   }
@@ -423,6 +540,8 @@
     showSnack('저장됨 · <a id="undo_link" href="#">↺ 되돌리기</a>');
     setTimeout(()=>{const u=$('#undo_link'); if(u){u.addEventListener('click',e=>{e.preventDefault(); undoLast();});}},50);
     renderHistory();
+    // 운동 세트는 저장 후 초기화
+    if(row.activity==='exercise'){ state.sets=[]; renderSets(); }
   }
 
   function undoLast(){
@@ -444,6 +563,19 @@
     saveRow(row);
   });
 
+  // ✅ 일일 지표 빠른 저장 (memo 행으로 저장)
+  $('#daily_save_btn').addEventListener('click',()=>{
+    const date = $('#date').value || todayStr();
+    const mkg = $('#morning_weight_kg').value? Number($('#morning_weight_kg').value):'';
+    const pgd = $('#protein_g_day').value? Number($('#protein_g_day').value):'';
+    const crt = $('#creatine_5g').checked? 'Y' : 'N';
+    const dte = $('#days_to_exam').value? Number($('#days_to_exam').value):'';
+    if(mkg==='' && pgd==='' && crt==='N' && dte==='') return showSnack('입력된 일일 지표가 없습니다.');
+    const row={ id:Date.now(), date, start_time:'', end_time:'', activity:'memo', sub_type:'daily', rating_name:'메모', rating:'', weight_kg:'', motivation:'', note:'', duration_min:'', sleep_end_date:'',
+      morning_weight_kg:mkg, protein_g_day:pgd, creatine_5g:crt, last_caffeine_time:'', screens_off_time:'', sleep_latency_min:'', recall_score_pct:'', distraction_count:'', days_to_exam:dte, exercise_json:'' };
+    saveRow(row);
+  });
+
   // history
   function renderHistory(){
     const tbody=$('#history_table tbody'); tbody.innerHTML='';
@@ -455,12 +587,41 @@
       const inRange=withinRange(r.date,from,to);
       return inAct && inText && inRange;
     }).sort((a,b)=>(a.date+(a.start_time||'')).localeCompare(b.date+(b.start_time||'')));
+
     filtered.forEach(r=>{
       const tr=document.createElement('tr');
       let dateDisplay = r.date;
-      if(r.activity === 'sleep' && r.sleep_end_date && r.sleep_end_date !== r.date) {
-        dateDisplay = r.date + '~' + r.sleep_end_date;
+      if(r.activity === 'sleep' && r.sleep_end_date && r.sleep_end_date !== r.date) { dateDisplay = r.date + '~' + r.sleep_end_date; }
+
+      // meta chips
+      const chips=[];
+      if(r.activity==='study'){
+        if(r.recall_score_pct!=='' && r.recall_score_pct!=null) chips.push(`<span class="pill">회상 ${r.recall_score_pct}%</span>`);
+        if(r.distraction_count!=='' && r.distraction_count!=null) chips.push(`<span class="pill">방해 ${r.distraction_count}</span>`);
       }
+      if(r.activity==='sleep'){
+        if(r.sleep_latency_min!=='') chips.push(`<span class="pill">입면 ${r.sleep_latency_min}분</span>`);
+        if(r.last_caffeine_time) chips.push(`<span class="pill">카페인 ${r.last_caffeine_time}</span>`);
+        if(r.screens_off_time) chips.push(`<span class="pill">스크린 ${r.screens_off_time}</span>`);
+      }
+      // memo(daily)
+      if(r.activity==='memo'){
+        if(r.sub_type==='daily'){
+          if(r.morning_weight_kg!=='') chips.push(`<span class="pill">아침 ${r.morning_weight_kg}kg</span>`);
+          if(r.protein_g_day!=='') chips.push(`<span class="pill">단백질 ${r.protein_g_day}g</span>`);
+          if(r.creatine_5g) chips.push(`<span class="pill">크레아틴 ${r.creatine_5g}</span>`);
+          if(r.days_to_exam!=='') chips.push(`<span class="pill">D-${r.days_to_exam}</span>`);
+        }
+      }
+      // exercise summary
+      if(r.activity==='exercise' && r.exercise_json){
+        try{ const ex=JSON.parse(r.exercise_json); if(ex){
+          const vol = ex.total_volume||0; const count=(ex.sets||[]).length; const mv=ex.movement||'운동';
+          chips.push(`<span class=\"pill\">${mv} ${count}세트 · ${vol}kg·reps</span>`);
+          if(ex.top_set) chips.push(`<span class=\"pill\">Top ${ex.top_set.weight}kg×${ex.top_set.reps}</span>`);
+        }}catch(e){}
+      }
+
       tr.innerHTML=`
         <td>${dateDisplay}</td>
         <td>${r.activity==='memo' ? '-' : (r.start_time||'')+'–'+(r.end_time||'')}<div class="help">${r.duration_min? r.duration_min+'분':''}</div></td>
@@ -468,7 +629,7 @@
         <td>${r.activity==='memo' ? '-' : (r.rating_name+' '+(r.rating??''))}</td>
         <td>${r.weight_kg??''}</td>
         <td>${r.motivation??''}</td>
-        <td>${r.sub_type? '<span class="pill">'+r.sub_type+'</span>' : ''}</td>
+        <td>${r.sub_type? '<span class="pill">'+r.sub_type+'</span>' : ''}${chips.length? '<div class="mt8">'+chips.join('')+'</div>':''}</td>
         <td>${r.note||''}</td>
         <td class="right"><button class="danger" data-del="${r.id}">삭제</button></td>`;
       tbody.appendChild(tr);
